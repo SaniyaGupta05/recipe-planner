@@ -8,22 +8,32 @@ import sys
 
 def check_imports():
     """Check if all required packages can be imported"""
-    try:
-        import flask
-        print("✓ Flask imported successfully")
-        
-        # Try to import Groq but don't fail if API key is missing
+    packages = [
+        ('flask', 'Flask'),
+        ('flask_cors', 'CORS'),
+        ('groq', 'Groq'),
+        ('firebase_admin', 'credentials'),
+        ('hashlib', 'sha256'),
+        ('re', 'compile'),
+        ('datetime', 'datetime'),
+        ('json', 'loads'),
+        ('random', 'randint'),
+        ('os', 'getenv')
+    ]
+    
+    all_imports_ok = True
+    for module_name, attribute in packages:
         try:
-            from groq import Groq
-            print("✓ Groq client imported successfully")
+            if module_name == 'flask_cors':
+                __import__('flask_cors')
+            else:
+                __import__(module_name)
+            print(f"✓ {module_name} imported successfully")
         except ImportError as e:
-            print(f"✗ Groq import failed: {e}")
-            return False
+            print(f"✗ {module_name} import failed: {e}")
+            all_imports_ok = False
             
-        return True
-    except ImportError as e:
-        print(f"✗ Import failed: {e}")
-        return False
+    return all_imports_ok
 
 def check_files():
     """Check if essential files exist"""
@@ -61,9 +71,15 @@ if __name__ == "__main__":
     
     print("=" * 50)
     
-    if files_ok and imports_ok:
-        print("✓ All validation checks passed!")
-        sys.exit(0)
+    if files_ok:
+        print("✓ All file checks passed!")
+        if imports_ok:
+            print("✓ All import checks passed!")
+            print("✓ Validation completed successfully!")
+            sys.exit(0)
+        else:
+            print("⚠ Some imports failed (check requirements.txt)")
+            sys.exit(1)
     else:
-        print("✗ Some validation checks failed")
+        print("✗ Some file checks failed")
         sys.exit(1)
