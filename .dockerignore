@@ -1,0 +1,11 @@
+﻿.git
+.github
+.gitignore
+*.log
+__pycache__
+*.pyc
+.venv
+env/
+venv/
+firebase_key.json
+.env

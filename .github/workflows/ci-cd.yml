@@ -1,0 +1,94 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Check syntax
+      run: |
+        python -m py_compile app.py
+        echo "✅ Syntax check passed!"
+        
+    - name: Test imports
+      run: |
+        python -c "
+        try:
+            import flask
+            import flask_cors
+            import pandas
+            print('✅ All imports successful!')
+        except ImportError as e:
+            print(f'❌ Import error: {e}')
+            exit(1)
+        "
+        
+    - name: Build Docker image
+      run: |
+        docker build -t cooking-helper .
+        
+    - name: Test Docker container
+      run: |
+        # Start container in background
+        docker run -d --name test-app -p 5000:5000 cooking-helper
+        
+        # Wait for app to start
+        sleep 10
+        
+        # Check if container is running
+        docker ps | grep test-app
+        
+        # Check container logs
+        docker logs test-app
+        
+        # Stop and remove container
+        docker stop test-app
+        docker rm test-app
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-image
+        path: .
+        
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Build production image
+      run: |
+        docker build -t cooking-helper:latest .
+        
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deployment would happen here!"
+        echo "Add your deployment commands for:"
+        echo "- Heroku"
+        echo "- AWS"
+        echo "- Azure"
+        echo "- DigitalOcean"
+        echo "Or any other cloud platform"
