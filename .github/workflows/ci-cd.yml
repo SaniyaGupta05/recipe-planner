@@ -24,20 +24,42 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        echo "Installed packages:"
+        pip list
 
     - name: Verify project structure
       run: |
-        echo 'Project structure:'
+        echo "Project structure:"
         ls -la
-        echo 'App directory:'
+        echo "App directory:"
         ls -la app/
 
     - name: Test Python imports
       run: |
-        python -c 'import flask; print(''✅ Flask import successful'')'
-        python -c 'import groq; print(''✅ Groq import successful'')'
-        python -c 'import firebase_admin; print(''✅ Firebase import successful'')'
-        echo '✅ All imports successful'
+        python -c "import flask; print('Flask import successful')"
+        python -c "import flask_cors; print('Flask CORS import successful')"
+        python -c "import groq; print('Groq import successful')"
+        python -c "import firebase_admin; print('Firebase import successful')"
+        python -c "import hashlib; print('Hashlib import successful')"
+        python -c "import re; print('Regex import successful')"
+        python -c "from datetime import datetime; print('Datetime import successful')"
+        python -c "import json; print('JSON import successful')"
+        python -c "import random; print('Random import successful')"
+        echo "All Python imports successful"
+
+    - name: Test app import
+      run: |
+        python -c "
+import os
+os.environ['GROQ_API_KEY'] = 'test-key'
+try:
+    from app.app import app
+    print('App import successful')
+    print('Flask app name:', app.name)
+except Exception as e:
+    print('App import failed:', e)
+    exit(1)
+"
 
     - name: Build Docker image
       run: |
@@ -45,10 +67,10 @@ jobs:
 
     - name: Test Docker container
       run: |
-        echo 'Testing Docker container...'
-        docker run --rm cooking-helper python -c 'print(''✅ Docker container works'')'
+        echo "Testing Docker container..."
+        docker run --rm cooking-helper python -c "print('Docker container works')"
 
     - name: Success
       run: |
-        echo '🎉 CI/CD Pipeline Completed Successfully!'
-        echo '✅ All tests passed'
+        echo 'CI/CD Pipeline Completed Successfully!'
+        echo 'All tests passed'
