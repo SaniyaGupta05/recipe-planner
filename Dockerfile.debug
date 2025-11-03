@@ -1,6 +1,0 @@
-﻿FROM python:3.9-slim
-WORKDIR /app
-COPY . .
-RUN echo "=== Listing all files ===" && ls -la
-RUN echo "=== Checking app folder ===" && ls -la app/
-RUN echo "=== Looking for app.py ===" && find . -name "app.py" -type f

@@ -9,3 +9,8 @@ env/
 venv/
 firebase_key.json
 .env
+*.key.json
+secrets/
+Dockerfile.debug
+app/app.py.backup
+docker-build/
